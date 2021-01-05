@@ -1,8 +1,9 @@
 from afaligner import *
+from nrclex import NRCLex
 import re
 import os
 
-def clean_html(raw_html):
+def _clean_html(raw_html):
     '''Isolates the words in each html tag from xhtml file of words.'''
 
     cleanr = re.compile('<.*?>')
@@ -15,14 +16,15 @@ def generate_xhtml_dict():
     xhtml_dict = {}
     for i, line in enumerate(xhtml.readlines()):
         idx = "f" + str(i)
-        text = clean_html(line)
+        text = _clean_html(line)
         xhtml_dict[idx] = text.strip(" \n")
-    print(xhtml_dict)
+
     return xhtml_dict
 
 def process_fragment(fragment, xhtml_dict):
     for key, val in list(fragment.items()):
         fragment[key]['text'] = xhtml_dict[key]
+        fragment[key]['emotion'] = NRCLex(xhtml_dict[key]).affect_frequencies
 
     return fragment
 
